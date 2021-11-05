@@ -9,6 +9,6 @@ DEBUG = True
 # Connect to the database
 
 
-# DONE IMPLEMENT DATABASE URL
+# DONE: IMPLEMENT DATABASE URL
 SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:postgres586@localhost:5432/fyuur'
 SQLALCHEMY_TRACK_MODIFICATIONS = False

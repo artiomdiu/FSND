@@ -42,8 +42,13 @@ class Venue(db.Model):
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+    genres = db.Column(db.String(120))
+    website = db.Column(db.String(120))
+    seeking_talent = db.Column(db.Boolean, nullable=False)
+    seeking_description = db.Column(db.String(120))
 
     # DONE: implement any missing fields, as a database migration using Flask-Migrate
+
 
 class Artist(db.Model):
     __tablename__ = 'Artist'
@@ -65,19 +70,22 @@ class Artist(db.Model):
 # Filters.
 #----------------------------------------------------------------------------#
 
-def format_datetime(value, format='medium'):
-  date = dateutil.parser.parse(value)
-  if format == 'full':
-      format="EEEE MMMM, d, y 'at' h:mma"
-  elif format == 'medium':
-      format="EE MM, dd, y h:mma"
-  return babel.dates.format_datetime(date, format, locale='en')
+
+def format_datetime(value, format_dt='medium'):
+    date = dateutil.parser.parse(value)
+    if format_dt == 'full':
+        format_dt="EEEE MMMM, d, y 'at' h:mma"
+    elif format_dt == 'medium':
+        format_dt="EE MM, dd, y h:mma"
+    return babel.dates.format_datetime(date, format_dt, locale='en')
+
 
 app.jinja_env.filters['datetime'] = format_datetime
 
 #----------------------------------------------------------------------------#
 # Controllers.
 #----------------------------------------------------------------------------#
+
 
 @app.route('/')
 def index():
@@ -216,10 +224,12 @@ def show_venue(venue_id):
 #  Create Venue
 #  ----------------------------------------------------------------
 
+
 @app.route('/venues/create', methods=['GET'])
 def create_venue_form():
-  form = VenueForm()
-  return render_template('forms/new_venue.html', form=form)
+    form = VenueForm()
+    return render_template('forms/new_venue.html', form=form)
+
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
