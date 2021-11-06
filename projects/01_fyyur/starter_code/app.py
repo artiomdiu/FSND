@@ -44,8 +44,9 @@ class Venue(db.Model):
     facebook_link = db.Column(db.String(120))
     genres = db.Column(db.String(120))
     website = db.Column(db.String(120))
-    seeking_talent = db.Column(db.Boolean, nullable=False)
+    seeking_talent = db.Column(db.Boolean, nullable=True)
     seeking_description = db.Column(db.String(120))
+    # shows = db.relationship('Show', backref='venues', lazy=True)
 
     # DONE: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -62,12 +63,22 @@ class Artist(db.Model):
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     website = db.Column(db.String(120))
-    seeking_venue = db.Column(db.Boolean, nullable=False)
+    seeking_venue = db.Column(db.Boolean, nullable=True)
     seeking_description = db.Column(db.String(120))
+    # shows = db.relationship('Show', backref='artists', lazy=True)
 
     # DONE: implement any missing fields, as a database migration using Flask-Migrate
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
+
+
+class Show(db.Model):
+    __tablename__ = 'Show'
+
+    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), primary_key=True)
+    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), primary_key=True)
+    start_time = db.Column(db.String(120), nullable=False)
+
 
 #----------------------------------------------------------------------------#
 # Filters.
