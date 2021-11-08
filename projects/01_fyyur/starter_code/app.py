@@ -247,15 +247,38 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+    # DONE: insert form data as a new Venue record in the db, instead
+    # TODO: modify data to be the data object returned from db insertion
 
-  # on successful db insert, flash success
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
-  return render_template('pages/home.html')
+    # on successful db insert, flash success
+    form_venue = VenueForm(request.form)
+    try:
+        venue = Venue(
+            name = form_venue.name,
+            city = form_venue.city,
+            state = form_venue.state,
+            address = form_venue.address,
+            phone = form_venue.phone,
+            image_link = form_venue.image_link,
+            facebook_link = form_venue.facebook_link,
+            genres = form_venue.genres,
+            website = form_venue.website_link,
+            seeking_talent = form_venue.seeking_talent,
+            seeking_description = form_venue.seeking_description
+        )
+        db.session.add(venue)
+        db.session.commit()
+        flash('Venue ' + request.form['name'] + ' was successfully listed!')
+    except:
+        # DONE: on unsuccessful db insert, flash an error instead.
+        # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
+        # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+        db.session.rollback()
+        flash('An error occurred. Venue ' + request.form.get('name') + ' could not be listed')
+    finally:
+        db.session.close()
+    return render_template('pages/home.html')
+
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
