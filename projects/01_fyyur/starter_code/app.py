@@ -44,9 +44,9 @@ class Venue(db.Model):
     facebook_link = db.Column(db.String(120))
     genres = db.Column(db.String(120))
     website = db.Column(db.String(120))
-    seeking_talent = db.Column(db.Boolean, nullable=True)
+    seeking_talent = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(120))
-    # shows = db.relationship('Show', backref='venues', lazy=True)
+    shows = db.relationship('Show', backref='venues', lazy=True)
 
     # DONE: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -63,13 +63,13 @@ class Artist(db.Model):
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     website = db.Column(db.String(120))
-    seeking_venue = db.Column(db.Boolean, nullable=True)
+    seeking_venue = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(120))
-    # shows = db.relationship('Show', backref='artists', lazy=True)
+    shows = db.relationship('Show', backref='artists', lazy=True)
 
     # DONE: implement any missing fields, as a database migration using Flask-Migrate
 
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
+# DONE: Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 
 
 class Show(db.Model):
@@ -274,7 +274,7 @@ def create_venue_submission():
         # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
         # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
         db.session.rollback()
-        flash('An error occurred. Venue ' + request.form.get('name') + ' could not be listed')
+        flash('An error occurred. Venue ' + form_venue.name + ' could not be listed')
     finally:
         db.session.close()
     return render_template('pages/home.html')
@@ -456,22 +456,45 @@ def edit_venue_submission(venue_id):
 #  Create Artist
 #  ----------------------------------------------------------------
 
+
 @app.route('/artists/create', methods=['GET'])
 def create_artist_form():
-  form = ArtistForm()
-  return render_template('forms/new_artist.html', form=form)
+    form = ArtistForm()
+    return render_template('forms/new_artist.html', form=form)
+
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
-  # called upon submitting the new artist listing form
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+    # called upon submitting the new artist listing form
+    # DONE: insert form data as a new Venue record in the db, instead
+    # DONE: modify data to be the data object returned from db insertion
 
-  # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
-  return render_template('pages/home.html')
+    # on successful db insert, flash success
+    form_artist = ArtistForm(request.form)
+    try:
+        artist = Artist(
+            name = form_artist.name,
+            city = form_artist.city,
+            state = form_artist.state,
+            phone = form_artist.phone,
+            image_link = form_artist.image_link,
+            genres = form_artist.genres,
+            facebook_link = form_artist.facebook_link,
+            website_link = form_artist.website_link,
+            seeking_venue = form_artist.seeking_venue,
+            seeking_description = form_artist.seeking_description
+        )
+        db.session.add(artist)
+        db.session.commit()
+        flash('Artist ' + request.form['name'] + ' was successfully listed!')
+    except:
+        # DONE: on unsuccessful db insert, flash an error instead.
+        # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
+        db.session.rollback()
+        flash('An error occured. Venue ' + form_artist.name + 'could not be listed')
+    finally:
+        db.session.close()
+    return render_template('pages/home.html')
 
 
 #  Shows
