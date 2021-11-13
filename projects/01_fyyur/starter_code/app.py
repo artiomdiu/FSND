@@ -293,13 +293,41 @@ def venues():
     #     }]
     # }]
     # data = Venue.query.all()
-    data_venues = Venue.query.all()
-    print(f'Data: {data_venues}, data type: {type(data_venues)}')
-    print(*data_venues, sep=', ')
-    data = {
-        'city': data_venues.city,
-        'state': data_venues.state
-    }
+    # data_venues = Venue.query.all()
+    # print(data_venues)
+    # print(f'Data: {data_venues}, data type: {type(data_venues)}')
+    # print(*data_venues, sep=', ')
+    data = []
+    unique_cities = Venue.query.distinct(Venue.city).all()
+    print(f'Unique cities: {unique_cities}')
+    print(f'Length of unique cities: {len(unique_cities)}')
+    # venues_in_city = Venue.query.filter_by(state='CA')
+    # for v in venues_in_city:
+    #     print(f'Venues in SF: {v.name}')
+    for city in unique_cities:
+        venues_in_city = Venue.query.filter_by(state=city.state)
+        for v in venues_in_city:
+            print(f'Venues in SF: {v.name}')
+        data.append({
+            'city': city.city,
+            'state': city.state,
+            # 'venues': [{
+            #     'id': city.id,
+            #     'name': city.name
+            # }]
+        })
+    print(f'data to be passed to js script: {data}')
+    # for v in unique_cities:
+    #     # print(f'***** Data: {v} *****')
+    #     venues_in_cities = Venue.query.filter_by(Venue.city == 'New York')
+    #     print(f'Venues in cities for {v}: {venues_in_cities}')
+    # data = {
+    #     'city': data_venues.city,
+    #     'state': data_venues.state,
+        # 'venues': [{
+        #     for v in Venue.query.filter_by(Venue.city == )
+        # }]
+    # }
     # print(f'Data: {data}, type: {type(data)}')
     return render_template('pages/venues.html', areas=data);
 
@@ -458,6 +486,7 @@ def delete_venue(venue_id):
   # clicking that button delete it from the db then redirect the user to the homepage
   return None
 
+
 #  Artists
 #  ----------------------------------------------------------------
 @app.route('/artists')
@@ -465,6 +494,7 @@ def artists():
     # DONE: replace with real data returned from querying the database
     data = Artist.query.all()
     return render_template('pages/artists.html', artists=data)
+
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
