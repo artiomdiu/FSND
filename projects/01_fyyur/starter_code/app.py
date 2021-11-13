@@ -300,35 +300,25 @@ def venues():
     data = []
     unique_cities = Venue.query.distinct(Venue.city).all()
     print(f'Unique cities: {unique_cities}')
-    print(f'Length of unique cities: {len(unique_cities)}')
-    # venues_in_city = Venue.query.filter_by(state='CA')
-    # for v in venues_in_city:
-    #     print(f'Venues in SF: {v.name}')
+
     for city in unique_cities:
         venues_in_city = Venue.query.filter_by(state=city.state)
-        for v in venues_in_city:
-            print(f'Venues in SF: {v.name}')
+        data_venues = []
+
+        for ven in venues_in_city:
+            data_venues.append({
+                'id': ven.id,
+                'name': ven.name
+            })
+            print(f'Data venues for {city.city}: {data_venues}')
+
         data.append({
             'city': city.city,
             'state': city.state,
-            # 'venues': [{
-            #     'id': city.id,
-            #     'name': city.name
-            # }]
+            'venues': data_venues
         })
     print(f'data to be passed to js script: {data}')
-    # for v in unique_cities:
-    #     # print(f'***** Data: {v} *****')
-    #     venues_in_cities = Venue.query.filter_by(Venue.city == 'New York')
-    #     print(f'Venues in cities for {v}: {venues_in_cities}')
-    # data = {
-    #     'city': data_venues.city,
-    #     'state': data_venues.state,
-        # 'venues': [{
-        #     for v in Venue.query.filter_by(Venue.city == )
-        # }]
-    # }
-    # print(f'Data: {data}, type: {type(data)}')
+
     return render_template('pages/venues.html', areas=data);
 
 
