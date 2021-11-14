@@ -219,7 +219,6 @@ class Show(db.Model):
 # Filters.
 #----------------------------------------------------------------------------#
 
-
 def format_datetime(value, format_dt='medium'):
     date = dateutil.parser.parse(value)
     if format_dt == 'full':
@@ -234,7 +233,6 @@ app.jinja_env.filters['datetime'] = format_datetime
 #----------------------------------------------------------------------------#
 # Controllers.
 #----------------------------------------------------------------------------#
-
 
 @app.route('/')
 def index():
@@ -400,8 +398,30 @@ def show_venue(venue_id):
   #   "past_shows_count": 1,
   #   "upcoming_shows_count": 1,
   # }
-  data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0]
-  return render_template('pages/show_venue.html', venue=data)
+
+    data = []
+    data_venue = Venue.query.all()
+
+    for d in data_venue:
+        data.append({
+            'id': d.id,
+            'name': d.name,
+            # 'genres': d.genres,
+            'address': d.address,
+            'city': d.city,
+            'state': d.state,
+            'phone': d.phone,
+            'website': d.website,
+            'facebook_link': d.facebook_link,
+            'seeking_talent': d.seeking_talent,
+            'image_link': d.image_link
+        })
+        print(f'****** {data}')
+
+    # data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0]
+
+    data = list(filter(lambda d: d['id'] == venue_id, data))[0]
+    return render_template('pages/show_venue.html', venue=data)
 
 
 #  Create Venue
@@ -615,9 +635,9 @@ def edit_venue_submission(venue_id):
   # venue record with ID <venue_id> using the new attributes
   return redirect(url_for('show_venue', venue_id=venue_id))
 
+
 #  Create Artist
 #  ----------------------------------------------------------------
-
 
 @app.route('/artists/create', methods=['GET'])
 def create_artist_form():
