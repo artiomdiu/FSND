@@ -1,7 +1,7 @@
 #----------------------------------------------------------------------------#
 # Imports
 #----------------------------------------------------------------------------#
-
+import datetime
 import json
 import sys
 
@@ -54,7 +54,7 @@ class Venue(db.Model):
         return f'<Venue ID: {self.id}, name: {self.name}, city: {self.city}, state: {self.state}>'
 
     def reset_to_initial_data(self):
-        Venue.query.delete()
+        # Venue.query.delete()
 
         data1 = {
             "id": 1,
@@ -130,7 +130,7 @@ class Artist(db.Model):
         return f'<Artist ID: {self.id}, name: {self.name}>'
 
     def reset_to_initial_data(self):
-        Artist.query.delete()
+        # Artist.query.delete()
 
         data1 = {
             "id": 4,
@@ -190,7 +190,7 @@ class Show(db.Model):
         return f'<Venue ID: {self.venue_id}, artist ID: {self.artist_id}, start time: {self.start_time}>'
 
     def reset_to_initial_data(self):
-        Show.query.delete()
+        # Show.query.delete()
 
         data = [{
             "venue_id": 1,
@@ -253,12 +253,17 @@ def index():
 @app.route('/reset')
 def reset_data():
     venue = Venue()
-    venue.reset_to_initial_data()
-
     artist = Artist()
-    artist.reset_to_initial_data()
-
     show = Show()
+
+    # Erasing DB tables
+    show.query.delete()
+    venue.query.delete()
+    artist.query.delete()
+
+    # Filling DB tables with data
+    venue.reset_to_initial_data()
+    artist.reset_to_initial_data()
     show.reset_to_initial_data()
 
     return render_template('pages/home.html')
@@ -269,55 +274,38 @@ def reset_data():
 
 @app.route('/venues')
 def venues():
-    # TODO: replace with real venues data.
+    # DONE: replace with real venues data.
     #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
-    # data=[{
-    #     "city": "San Francisco",
-    #     "state": "CA",
-    #     "venues": [{
-    #         "id": 1,
-    #         "name": "The Musical Hop",
-    #         "num_upcoming_shows": 0,
-    #     }, {
-    #         "id": 3,
-    #         "name": "Park Square Live Music & Coffee",
-    #         "num_upcoming_shows": 1,
-    #     }]
-    # }, {
-    #     "city": "New York",
-    #     "state": "NY",
-    #     "venues": [{
-    #         "id": 2,
-    #         "name": "The Dueling Pianos Bar",
-    #         "num_upcoming_shows": 0,
-    #     }]
-    # }]
-    # data = Venue.query.all()
-    # data_venues = Venue.query.all()
-    # print(data_venues)
-    # print(f'Data: {data_venues}, data type: {type(data_venues)}')
-    # print(*data_venues, sep=', ')
+
     data = []
     unique_cities = Venue.query.distinct(Venue.city).all()
-    print(f'Unique cities: {unique_cities}')
 
     for city in unique_cities:
         venues_in_city = Venue.query.filter_by(state=city.state)
         data_venues = []
 
         for ven in venues_in_city:
+            shows_in_venue = Show.query.filter_by(venue_id=ven.id)
+            show_count = 0
+
+            for s in shows_in_venue:
+                current_time = datetime.now()
+                start_time_dt = datetime.strptime(s.start_time[:-5], '%Y-%m-%dT%H:%M:%S')
+
+                if start_time_dt > current_time:
+                    show_count += 1
+
             data_venues.append({
                 'id': ven.id,
-                'name': ven.name
+                'name': ven.name,
+                'num_upcoming_shows': show_count
             })
-            print(f'Data venues for {city.city}: {data_venues}')
 
         data.append({
             'city': city.city,
             'state': city.state,
             'venues': data_venues
         })
-    print(f'data to be passed to js script: {data}')
 
     return render_template('pages/venues.html', areas=data);
 
@@ -328,7 +316,7 @@ def search_venues():
   # seach for Hop should return "The Musical Hop".
   # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
   response={
-    "count": 1,
+    "count": '???',
     "data": [{
       "id": 2,
       "name": "The Dueling Pianos Bar",
