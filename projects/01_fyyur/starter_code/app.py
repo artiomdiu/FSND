@@ -54,8 +54,6 @@ class Venue(db.Model):
         return f'<Venue ID: {self.id}, name: {self.name}, city: {self.city}, state: {self.state}>'
 
     def reset_to_initial_data(self):
-        # Venue.query.delete()
-
         data1 = {
             "id": 1,
             "name": "The Musical Hop",
@@ -130,8 +128,6 @@ class Artist(db.Model):
         return f'<Artist ID: {self.id}, name: {self.name}>'
 
     def reset_to_initial_data(self):
-        # Artist.query.delete()
-
         data1 = {
             "id": 4,
             "name": "Guns N Petals",
@@ -190,8 +186,6 @@ class Show(db.Model):
         return f'<Venue ID: {self.venue_id}, artist ID: {self.artist_id}, start time: {self.start_time}>'
 
     def reset_to_initial_data(self):
-        # Show.query.delete()
-
         data = [{
             "venue_id": 1,
             "artist_id": 4,
@@ -409,9 +403,9 @@ def show_venue(venue_id):
   data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0]
   return render_template('pages/show_venue.html', venue=data)
 
+
 #  Create Venue
 #  ----------------------------------------------------------------
-
 
 @app.route('/venues/create', methods=['GET'])
 def create_venue_form():
@@ -671,45 +665,32 @@ def create_artist_submission():
 
 @app.route('/shows')
 def shows():
-  # displays list of shows at /shows
-  # TODO: replace with real venues data.
-  data=[{
-    "venue_id": 1,
-    "venue_name": "The Musical Hop",
-    "artist_id": 4,
-    "artist_name": "Guns N Petals",
-    "artist_image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
-    "start_time": "2019-05-21T21:30:00.000Z"
-  }, {
-    "venue_id": 3,
-    "venue_name": "Park Square Live Music & Coffee",
-    "artist_id": 5,
-    "artist_name": "Matt Quevedo",
-    "artist_image_link": "https://images.unsplash.com/photo-1495223153807-b916f75de8c5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80",
-    "start_time": "2019-06-15T23:00:00.000Z"
-  }, {
-    "venue_id": 3,
-    "venue_name": "Park Square Live Music & Coffee",
-    "artist_id": 6,
-    "artist_name": "The Wild Sax Band",
-    "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-    "start_time": "2035-04-01T20:00:00.000Z"
-  }, {
-    "venue_id": 3,
-    "venue_name": "Park Square Live Music & Coffee",
-    "artist_id": 6,
-    "artist_name": "The Wild Sax Band",
-    "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-    "start_time": "2035-04-08T20:00:00.000Z"
-  }, {
-    "venue_id": 3,
-    "venue_name": "Park Square Live Music & Coffee",
-    "artist_id": 6,
-    "artist_name": "The Wild Sax Band",
-    "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-    "start_time": "2035-04-15T20:00:00.000Z"
-  }]
-  return render_template('pages/shows.html', shows=data)
+    # displays list of shows at /shows
+    # DONE: replace with real venues data.
+
+    data = []
+    show_data = Show.query.all()
+    for show in show_data:
+
+        venue_data = Venue.query.filter_by(id=show.venue_id)
+        for v in venue_data:
+            venue_name = v.name
+
+        artist_data = Artist.query.filter_by(id=show.artist_id)
+        for a in artist_data:
+            artist_name = a.name
+            artist_image_link = a.image_link
+
+        data.append({
+            'venue_id': show.venue_id,
+            'venue_name': venue_name,
+            'artist_id': show.artist_id,
+            'artist_name': artist_name,
+            'artist_image_link': artist_image_link,
+            'start_time': show.start_time
+        })
+
+    return render_template('pages/shows.html', shows=data)
 
 
 @app.route('/shows/create')
