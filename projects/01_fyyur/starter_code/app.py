@@ -1,6 +1,6 @@
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 # Imports
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 import datetime
 import json
 import sys
@@ -15,23 +15,22 @@ from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
 from flask_migrate import Migrate
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 # App Config.
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 
 app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 
+# DONE: connect to a local postgresql database
 migrate = Migrate(app, db)
 
-# DONE: connect to a local postgresql database
 
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 # Models.
-#----------------------------------------------------------------------------#
-
+# ----------------------------------------------------------------------------#
 
 class Venue(db.Model):
     __tablename__ = 'Venue'
@@ -95,9 +94,9 @@ class Venue(db.Model):
             "image_link": "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=747&q=80"
         }
 
-        venues = [data1, data2, data3]
+        venue_data = [data1, data2, data3]
 
-        for data in venues:
+        for data in venue_data:
             venue = Venue(**data)
             db.session.add(venue)
 
@@ -163,9 +162,9 @@ class Artist(db.Model):
             "image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80"
         }
 
-        artists = [data1, data2, data3]
+        artist_data = [data1, data2, data3]
 
-        for data in artists:
+        for data in artist_data:
             artist = Artist(**data)
             db.session.add(artist)
 
@@ -215,9 +214,9 @@ class Show(db.Model):
         db.session.commit()
 
 
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 # Filters.
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 
 def format_datetime(value, format_dt='medium'):
     date = dateutil.parser.parse(value)
@@ -230,9 +229,10 @@ def format_datetime(value, format_dt='medium'):
 
 app.jinja_env.filters['datetime'] = format_datetime
 
-#----------------------------------------------------------------------------#
+
+# ----------------------------------------------------------------------------#
 # Controllers.
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 
 @app.route('/')
 def index():
@@ -267,7 +267,7 @@ def reset_data():
 @app.route('/venues')
 def venues():
     # DONE: replace with real venues data.
-    #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
+    # num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
 
     data = []
     unique_cities = Venue.query.distinct(Venue.city).all()
@@ -399,17 +399,17 @@ def create_venue_submission():
     form_venue = VenueForm(request.form)
     try:
         venue = Venue(
-            name = form_venue.name.data,
-            city = form_venue.city.data,
-            state = form_venue.state.data,
-            address = form_venue.address.data,
-            phone = form_venue.phone.data,
-            image_link = form_venue.image_link.data,
-            facebook_link = form_venue.facebook_link.data,
-            genres = form_venue.genres.data,
-            website = form_venue.website_link.data,
-            seeking_talent = form_venue.seeking_talent.data,
-            seeking_description = form_venue.seeking_description.data
+            name=form_venue.name.data,
+            city=form_venue.city.data,
+            state=form_venue.state.data,
+            address=form_venue.address.data,
+            phone=form_venue.phone.data,
+            image_link=form_venue.image_link.data,
+            facebook_link=form_venue.facebook_link.data,
+            genres=form_venue.genres.data,
+            website=form_venue.website_link.data,
+            seeking_talent=form_venue.seeking_talent.data,
+            seeking_description=form_venue.seeking_description.data
         )
         db.session.add(venue)
         db.session.commit()
@@ -558,12 +558,14 @@ def edit_artist(artist_id):
   # TODO: populate form with fields from artist with ID <artist_id>
   return render_template('forms/edit_artist.html', form=form, artist=artist)
 
+
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
   # TODO: take values from the form submitted, and update existing
   # artist record with ID <artist_id> using the new attributes
 
   return redirect(url_for('show_artist', artist_id=artist_id))
+
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
@@ -584,6 +586,7 @@ def edit_venue(venue_id):
   }
   # TODO: populate form with values from venue with ID <venue_id>
   return render_template('forms/edit_venue.html', form=form, venue=venue)
+
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
@@ -725,9 +728,9 @@ if not app.debug:
     app.logger.addHandler(file_handler)
     app.logger.info('errors')
 
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 # Launch.
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 
 # Default port:
 if __name__ == '__main__':
