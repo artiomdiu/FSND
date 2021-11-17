@@ -320,11 +320,11 @@ def search_venues():
     search_term = request.form.get('search_term')
     venue_search_data = Venue.query.filter(Venue.name.ilike(f'%{search_term}%')).all()
     search_count = str(len(venue_search_data))
-    print(venue_search_data)
 
     # for v in venue_search_data:
     #     upcoming_shows_count = 0
     #     shows_in_venue = Show.query.filter_by(venue_id=v.id)
+    #
     #     for s in shows_in_venue:
     #         current_time = datetime.now()
     #         start_time_dt = datetime.strptime(s.start_time[:-5], '%Y-%m-%dT%H:%M:%S')
@@ -332,10 +332,8 @@ def search_venues():
     #         if start_time_dt > current_time:
     #             upcoming_shows_count += 1
     #
-    #     venue_search_data.append(upcoming_shows_count)
-
-    print(f'Input: {search_term}, output: {venue_search_data}, count: {search_count}')
-    print('Finished')
+    # # venue_search_data.append({'num_upcoming_shows': upcoming_shows_count})
+    # # print(venue_search_data)
 
     response = {
         'count': search_count,
