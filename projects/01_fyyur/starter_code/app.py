@@ -594,6 +594,7 @@ def edit_artist_submission(artist_id):
     form = ArtistForm(request.form)
     try:
         artist = Artist.query.get(artist_id)
+
         artist.name = form.name.data
         artist.genres = form.genres.data
         artist.city = form.city.data
@@ -647,12 +648,13 @@ def edit_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-    # TODO: take values from the form submitted, and update existing
+    # DONE: take values from the form submitted, and update existing
     # venue record with ID <venue_id> using the new attributes
 
     form = VenueForm(request.form)
     try:
         venue = Venue.query.get(venue_id)
+
         venue.name = form.name.data
         venue.genres = form.genres.data
         venue.address = form.address.data
