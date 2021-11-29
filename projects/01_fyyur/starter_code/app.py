@@ -705,7 +705,7 @@ def create_artist_submission():
             image_link = form_artist.image_link.data,
             genres = form_artist.genres.data,
             facebook_link = form_artist.facebook_link.data,
-            website_link = form_artist.website_link.data,
+            website = form_artist.website_link.data,
             seeking_venue = form_artist.seeking_venue.data,
             seeking_description = form_artist.seeking_description.data
         )
@@ -716,7 +716,7 @@ def create_artist_submission():
         # DONE: on unsuccessful db insert, flash an error instead.
         # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
         db.session.rollback()
-        flash('An error occured. Venue ' + form_artist.name.data + 'could not be listed')
+        flash('An error occured. Venue ' + form_artist.name.data + ' could not be listed')
         logging.exception(f'Failed to create an artist')
     finally:
         db.session.close()
