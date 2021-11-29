@@ -14,7 +14,7 @@ from logging import Formatter, FileHandler
 from forms import *
 from flask_migrate import Migrate
 
-from models import Artist, Venue, Show
+from models import *
 
 # ----------------------------------------------------------------------------#
 # App Config.
@@ -23,11 +23,11 @@ from models import Artist, Venue, Show
 app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
-db = SQLAlchemy(app)
 
 # DONE: connect to a local postgresql database
 migrate = Migrate(app, db)
 
+db.init_app(app)
 
 # ----------------------------------------------------------------------------#
 # Filters.
