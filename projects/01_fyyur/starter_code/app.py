@@ -1,7 +1,8 @@
 # ----------------------------------------------------------------------------#
 # Imports
 # ----------------------------------------------------------------------------#
-import datetime
+# import datetime
+from datetime import datetime
 import sys
 
 import dateutil.parser
@@ -158,63 +159,37 @@ def show_venue(venue_id):
     # shows the venue page with the given venue_id
     # DONE: replace with real venue data from the venues table, using venue_id
 
-    data = []
-    data_venue = Venue.query.all()
+    venue = Venue.query.get_or_404(venue_id)
 
-    for d in data_venue:
-        genres = d.genres[1:-1]
-        genres = list(genres.split(','))
+    past_shows = []
+    upcoming_shows = []
 
-        shows_in_venue = Show.query.filter_by(venue_id=d.id)
-        upcoming_shows_count = 0
-        past_shows_count = 0
-        upcoming_shows = []
-        past_shows = []
+    for show in venue.shows:
+        temp_show = {
+            'artist_id': show.artist_id,
+            'artist_name': show.artist.name,
+            'artist_image_link': show.artist.image_link,
+            'start_time': show.start_time
+        }
 
-        for s in shows_in_venue:
-            current_time = datetime.now()
-            start_time_dt = datetime.strptime(
-                s.start_time[:-5],
-                '%Y-%m-%dT%H:%M:%S'
-            )
-            artist_in_show = Artist.query.filter_by(id=s.artist_id).first()
+        start_time_dt = datetime.strptime(
+            show.start_time[:-5],
+            '%Y-%m-%dT%H:%M:%S'
+        )
 
-            if start_time_dt > current_time:
-                upcoming_shows_count += 1
-                upcoming_shows.append({
-                    'artist_id': s.artist_id,
-                    'artist_name': artist_in_show.name,
-                    'artist_image_link': artist_in_show.image_link,
-                    'start_time': s.start_time
-                })
-            else:
-                past_shows_count +=1
-                past_shows.append({
-                    'artist_id': s.artist_id,
-                    'artist_name': artist_in_show.name,
-                    'artist_image_link': artist_in_show.image_link,
-                    'start_time': s.start_time
-                })
+        if start_time_dt <= datetime.now():
+            past_shows.append(temp_show)
+        else:
+            upcoming_shows.append(temp_show)
 
-        data.append({
-            'id': d.id,
-            'name': d.name,
-            'genres': genres,
-            'address': d.address,
-            'city': d.city,
-            'state': d.state,
-            'phone': d.phone,
-            'website': d.website,
-            'facebook_link': d.facebook_link,
-            'seeking_talent': d.seeking_talent,
-            'image_link': d.image_link,
-            'past_shows': past_shows,
-            'upcoming_shows': upcoming_shows,
-            'past_shows_count': past_shows_count,
-            'upcoming_shows_count': upcoming_shows_count
-        })
+    # object class to dict
+    data = vars(venue)
 
-    data = list(filter(lambda d: d['id'] == venue_id, data))[0]
+    data['past_shows'] = past_shows
+    data['upcoming_shows'] = upcoming_shows
+    data['past_shows_count'] = len(past_shows)
+    data['upcoming_shows_count'] = len(upcoming_shows)
+    data['genres'] = list(venue.genres[1:-1].split(','))
 
     return render_template('pages/show_venue.html', venue=data)
 
