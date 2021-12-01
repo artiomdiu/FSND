@@ -6,7 +6,14 @@ import sys
 
 import dateutil.parser
 import babel
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import (
+    Flask,
+    render_template,
+    request,
+    flash,
+    redirect,
+    url_for
+)
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 import logging
@@ -28,6 +35,7 @@ app.config.from_object('config')
 migrate = Migrate(app, db)
 
 db.init_app(app)
+
 
 # ----------------------------------------------------------------------------#
 # Filters.
@@ -82,7 +90,8 @@ def reset_data():
 @app.route('/venues')
 def venues():
     # DONE: replace with real venues data.
-    # num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
+    # num_upcoming_shows should be aggregated based on
+    # number of upcoming shows per venue.
 
     data = []
     unique_cities = Venue.query.distinct(Venue.city).all()
@@ -97,7 +106,10 @@ def venues():
 
             for s in shows_in_venue:
                 current_time = datetime.now()
-                start_time_dt = datetime.strptime(s.start_time[:-5], '%Y-%m-%dT%H:%M:%S')
+                start_time_dt = datetime.strptime(
+                    s.start_time[:-5],
+                    '%Y-%m-%dT%H:%M:%S'
+                )
 
                 if start_time_dt > current_time:
                     show_count += 1
@@ -114,39 +126,31 @@ def venues():
             'venues': data_venues
         })
 
-    return render_template('pages/venues.html', areas=data);
+    return render_template('pages/venues.html', areas=data)
 
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
-    # DONE: implement search on artists with partial string search. Ensure it is case-insensitive.
+    # DONE: implement search on artists with partial string search.
+    # Ensure it is case-insensitive.
     # seach for Hop should return "The Musical Hop".
-    # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
+    # search for "Music" should return "The Musical Hop" and
+    # "Park Square Live Music & Coffee"
 
     search_term = request.form.get('search_term')
     venue_search_data = Venue.query.filter(Venue.name.ilike(f'%{search_term}%')).all()
     search_count = str(len(venue_search_data))
-
-    # for v in venue_search_data:
-    #     upcoming_shows_count = 0
-    #     shows_in_venue = Show.query.filter_by(venue_id=v.id)
-    #
-    #     for s in shows_in_venue:
-    #         current_time = datetime.now()
-    #         start_time_dt = datetime.strptime(s.start_time[:-5], '%Y-%m-%dT%H:%M:%S')
-    #
-    #         if start_time_dt > current_time:
-    #             upcoming_shows_count += 1
-    #
-    # # venue_search_data.append({'num_upcoming_shows': upcoming_shows_count})
-    # # print(venue_search_data)
 
     response = {
         'count': search_count,
         'data': venue_search_data
     }
 
-    return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
+    return render_template(
+        'pages/search_venues.html',
+        esults=response,
+        search_term=request.form.get('search_term', '')
+    )
 
 
 @app.route('/venues/<int:venue_id>')
@@ -169,7 +173,10 @@ def show_venue(venue_id):
 
         for s in shows_in_venue:
             current_time = datetime.now()
-            start_time_dt = datetime.strptime(s.start_time[:-5], '%Y-%m-%dT%H:%M:%S')
+            start_time_dt = datetime.strptime(
+                s.start_time[:-5],
+                '%Y-%m-%dT%H:%M:%S'
+            )
             artist_in_show = Artist.query.filter_by(id=s.artist_id).first()
 
             if start_time_dt > current_time:
@@ -247,10 +254,12 @@ def create_venue_submission():
         flash('Venue ' + form_venue.name.data + ' was successfully listed!')
     except:
         # DONE: on unsuccessful db insert, flash an error instead.
-        # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
+        # e.g., flash('An error occurred. Venue ' + data.name +
+        # ' could not be listed.')
         # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
         db.session.rollback()
-        flash('An error occurred. Venue ' + form_venue.name.data + ' could not be listed')
+        flash('An error occurred. Venue ' + form_venue.name.data +
+              ' could not be listed')
         logging.exception(f'Failed to create a venue')
     finally:
         db.session.close()
@@ -260,7 +269,8 @@ def create_venue_submission():
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
     # DONE: Complete this endpoint for taking a venue_id, and using
-    # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
+    # SQLAlchemy ORM to delete a record.
+    # Handle cases where the session commit could fail.
 
     error = False
     try:
@@ -275,8 +285,11 @@ def delete_venue(venue_id):
     finally:
         db.session.close()
 
-    # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-    # clicking that button delete it from the db then redirect the user to the homepage
+    # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page,
+    # have it so that
+    # clicking that button delete it from the db
+    # then redirect the user to the homepage
+
     return None
 
 
@@ -292,8 +305,10 @@ def artists():
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
-    # DONE: implement search on artists with partial string search. Ensure it is case-insensitive.
-    # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
+    # DONE: implement search on artists with partial string search.
+    # Ensure it is case-insensitive.
+    # seach for "A" should return "Guns N Petals", "Matt Quevado",
+    # and "The Wild Sax Band".
     # search for "band" should return "The Wild Sax Band".
 
     search_term = request.form.get('search_term')
@@ -305,13 +320,18 @@ def search_artists():
         'data': artist_search_data
     }
 
-    return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
+    return render_template(
+        'pages/search_artists.html',
+        results=response,
+        search_term=request.form.get('search_term', '')
+    )
 
 
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
     # shows the artist page with the given artist_id
-    # DONE: replace with real artist data from the artist table, using artist_id
+    # DONE: replace with real artist data from the artist table,
+    # using artist_id
 
     data = []
     data_artist = Artist.query.all()
@@ -328,7 +348,10 @@ def show_artist(artist_id):
 
         for s in shows_in_artist:
             current_time = datetime.now()
-            start_time_dt = datetime.strptime(s.start_time[:-5], '%Y-%m-%dT%H:%M:%S')
+            start_time_dt = datetime.strptime(
+                s.start_time[:-5],
+                '%Y-%m-%dT%H:%M:%S'
+            )
             venue_in_show = Venue.query.filter_by(id=s.venue_id).first()
 
             if start_time_dt > current_time:
@@ -529,9 +552,11 @@ def create_artist_submission():
         flash('Artist ' + form_artist.name.data + ' was successfully listed!')
     except:
         # DONE: on unsuccessful db insert, flash an error instead.
-        # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
+        # e.g., flash('An error occurred. Artist ' + data.name +
+        # ' could not be listed.')
         db.session.rollback()
-        flash('An error occured. Venue ' + form_artist.name.data + ' could not be listed')
+        flash('An error occured. Venue ' + form_artist.name.data +
+              ' could not be listed')
         logging.exception(f'Failed to create an artist')
     finally:
         db.session.close()
@@ -580,7 +605,8 @@ def create_shows():
 
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
-    # called to create new shows in the db, upon submitting new show listing form
+    # called to create new shows in the db,
+    # upon submitting new show listing form
     # DONE: insert form data as a new Show record in the db, instead
 
     # on successful db insert, flash success
@@ -600,7 +626,8 @@ def create_show_submission():
         # e.g., flash('An error occurred. Show could not be listed.')
         # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
         db.session.rollback()
-        flash('An error occurred. Show could not be listed. {}'.format(sys.exc_info()))
+        flash('An error occurred. '
+              'Show could not be listed. {}'.format(sys.exc_info()))
         logging.exception(f'Failed to create a show')
     finally:
         db.session.close()
@@ -620,7 +647,8 @@ def server_error(error):
 if not app.debug:
     file_handler = FileHandler('error.log')
     file_handler.setFormatter(
-        Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
+        Formatter('%(asctime)s %(levelname)s: '
+                  '%(message)s [in %(pathname)s:%(lineno)d]')
     )
     app.logger.setLevel(logging.INFO)
     file_handler.setLevel(logging.INFO)
