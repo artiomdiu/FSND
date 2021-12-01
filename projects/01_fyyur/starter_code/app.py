@@ -308,63 +308,37 @@ def show_artist(artist_id):
     # DONE: replace with real artist data from the artist table,
     # using artist_id
 
-    data = []
-    data_artist = Artist.query.all()
+    artist = Artist.query.get_or_404(artist_id)
 
-    for a in data_artist:
-        genres = a.genres[1:-1]
-        genres = list(genres.split(','))
+    past_shows = []
+    upcoming_shows = []
 
-        shows_in_artist = Show.query.filter_by(artist_id=a.id)
-        upcoming_shows_count = 0
-        past_shows_count = 0
-        upcoming_shows = []
-        past_shows = []
+    for show in artist.shows:
+        temp_show = {
+            'artist_id': show.venue_id,
+            'artist_name': show.venue.name,
+            'artist_image_link': show.venue.image_link,
+            'start_time': show.start_time
+        }
 
-        for s in shows_in_artist:
-            current_time = datetime.now()
-            start_time_dt = datetime.strptime(
-                s.start_time[:-5],
-                '%Y-%m-%dT%H:%M:%S'
-            )
-            venue_in_show = Venue.query.filter_by(id=s.venue_id).first()
+        start_time_dt = datetime.strptime(
+            show.start_time[:-5],
+            '%Y-%m-%dT%H:%M:%S'
+        )
 
-            if start_time_dt > current_time:
-                upcoming_shows_count += 1
-                upcoming_shows.append({
-                    'venue_id': s.venue_id,
-                    'venue_name': venue_in_show.name,
-                    'venue_image_link': venue_in_show.image_link,
-                    'start_time': s.start_time
-                })
-            else:
-                past_shows_count +=1
-                past_shows.append({
-                    'venue_id': s.venue_id,
-                    'venue_name': venue_in_show.name,
-                    'venue_image_link': venue_in_show.image_link,
-                    'start_time': s.start_time
-                })
+        if start_time_dt <= datetime.now():
+            past_shows.append(temp_show)
+        else:
+            upcoming_shows.append(temp_show)
 
-        data.append({
-            'id': a.id,
-            'name': a.name,
-            'genres': genres,
-            'city': a.city,
-            'state': a.state,
-            'phone': a.phone,
-            'website': a.website,
-            'facebook_link': a.facebook_link,
-            'seeking_venue': a.seeking_venue,
-            'seeking_description': a.seeking_description,
-            'image_link': a.image_link,
-            'past_shows': past_shows,
-            'upcoming_shows': upcoming_shows,
-            'past_shows_count': past_shows_count,
-            'upcoming_shows_count': upcoming_shows_count
-        })
+    # object class to dict
+    data = vars(artist)
 
-    data = list(filter(lambda d: d['id'] == artist_id, data))[0]
+    data['past_shows'] = past_shows
+    data['upcoming_shows'] = upcoming_shows
+    data['past_shows_count'] = len(past_shows)
+    data['upcoming_shows_count'] = len(upcoming_shows)
+    data['genres'] = list(artist.genres[1:-1].split(','))
 
     return render_template('pages/show_artist.html', artist=data)
 
