@@ -189,7 +189,7 @@ def show_venue(venue_id):
     data['upcoming_shows'] = upcoming_shows
     data['past_shows_count'] = len(past_shows)
     data['upcoming_shows_count'] = len(upcoming_shows)
-    data['genres'] = list(venue.genres[1:-1].split(','))
+    data['genres'] = list(venue.genres[1:-1].replace('"', "").split(','))
 
     return render_template('pages/show_venue.html', venue=data)
 
@@ -338,7 +338,7 @@ def show_artist(artist_id):
     data['upcoming_shows'] = upcoming_shows
     data['past_shows_count'] = len(past_shows)
     data['upcoming_shows_count'] = len(upcoming_shows)
-    data['genres'] = list(artist.genres[1:-1].split(','))
+    data['genres'] = list(artist.genres[1:-1].replace('"', "").split(','))
 
     return render_template('pages/show_artist.html', artist=data)
 
@@ -485,16 +485,16 @@ def create_artist_submission():
     form_artist = ArtistForm(request.form)
     try:
         artist = Artist(
-            name = form_artist.name.data,
-            city = form_artist.city.data,
-            state = form_artist.state.data,
-            phone = form_artist.phone.data,
+            name=form_artist.name.data,
+            city=form_artist.city.data,
+            state=form_artist.state.data,
+            phone=form_artist.phone.data,
             image_link = form_artist.image_link.data,
-            genres = form_artist.genres.data,
-            facebook_link = form_artist.facebook_link.data,
-            website = form_artist.website_link.data,
-            seeking_venue = form_artist.seeking_venue.data,
-            seeking_description = form_artist.seeking_description.data
+            genres=form_artist.genres.data,
+            facebook_link=form_artist.facebook_link.data,
+            website=form_artist.website_link.data,
+            seeking_venue=form_artist.seeking_venue.data,
+            seeking_description=form_artist.seeking_description.data
         )
         db.session.add(artist)
         db.session.commit()
