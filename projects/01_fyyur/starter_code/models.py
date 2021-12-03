@@ -134,7 +134,7 @@ class Artist(db.Model):
 
     def reset_to_initial_data(self):
         data1 = {
-            "id": 4,
+            "id": 1,
             "name": "Guns N Petals",
             "genres": ["Rock n Roll"],
             "city": "San Francisco",
@@ -147,7 +147,7 @@ class Artist(db.Model):
             "image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80"
         }
         data2 = {
-            "id": 5,
+            "id": 2,
             "name": "Matt Quevedo",
             "genres": ["Jazz"],
             "city": "New York",
@@ -158,7 +158,7 @@ class Artist(db.Model):
             "image_link": "https://images.unsplash.com/photo-1495223153807-b916f75de8c5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80"
         }
         data3 = {
-            "id": 6,
+            "id": 3,
             "name": "The Wild Sax Band",
             "genres": ["Jazz", "Classical"],
             "city": "San Francisco",
@@ -193,7 +193,7 @@ class Show(db.Model):
         db.ForeignKey('Artist.id'),
         nullable=False
     )
-    start_time = db.Column(db.String(120), nullable=False)
+    start_time = db.Column(db.DateTime(), nullable=False)
 
     def __repr__(self):
         return \
@@ -204,23 +204,23 @@ class Show(db.Model):
     def reset_to_initial_data(self):
         data = [{
             "venue_id": 1,
-            "artist_id": 4,
+            "artist_id": 1,
             "start_time": "2019-05-21T21:30:00.000Z"
         }, {
             "venue_id": 3,
-            "artist_id": 5,
+            "artist_id": 2,
             "start_time": "2019-06-15T23:00:00.000Z"
         }, {
             "venue_id": 3,
-            "artist_id": 6,
+            "artist_id": 3,
             "start_time": "2035-04-01T20:00:00.000Z"
         }, {
             "venue_id": 3,
-            "artist_id": 6,
+            "artist_id": 3,
             "start_time": "2035-04-08T20:00:00.000Z"
         }, {
             "venue_id": 3,
-            "artist_id": 6,
+            "artist_id": 3,
             "start_time": "2035-04-15T20:00:00.000Z"
         }]
 

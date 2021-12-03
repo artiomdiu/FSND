@@ -169,7 +169,7 @@ def show_venue(venue_id):
             'artist_id': show.artist_id,
             'artist_name': show.artist.name,
             'artist_image_link': show.artist.image_link,
-            'start_time': show.start_time
+            'start_time': str(show.start_time)
         }
 
         start_time_dt = datetime.strptime(
@@ -318,7 +318,7 @@ def show_artist(artist_id):
             'venue_id': show.venue_id,
             'venue_name': show.venue.name,
             'venue_image_link': show.venue.image_link,
-            'start_time': show.start_time
+            'start_time': str(show.start_time)
         }
 
         start_time_dt = datetime.strptime(
