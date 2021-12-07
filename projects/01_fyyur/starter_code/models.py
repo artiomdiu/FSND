@@ -12,6 +12,7 @@ from flask import (
 )
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -193,7 +194,8 @@ class Show(db.Model):
         db.ForeignKey('Artist.id'),
         nullable=False
     )
-    start_time = db.Column(db.DateTime(), nullable=False)
+    start_time = db.Column(db.DateTime, nullable=False,
+                           default=datetime.utcnow)
 
     def __repr__(self):
         return \

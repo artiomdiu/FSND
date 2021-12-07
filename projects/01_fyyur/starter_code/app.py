@@ -160,27 +160,29 @@ def show_venue(venue_id):
     # DONE: replace with real venue data from the venues table, using venue_id
 
     venue = Venue.query.get_or_404(venue_id)
-
     past_shows = []
     upcoming_shows = []
 
-    for show in venue.shows:
-        temp_show = {
-            'artist_id': show.artist_id,
-            'artist_name': show.artist.name,
-            'artist_image_link': show.artist.image_link,
-            'start_time': str(show.start_time)
-        }
-
+    shows_query = db.session.query(Show).join(Artist).filter(Show.venue_id==venue_id).all()
+    for show in shows_query:
         start_time_dt = datetime.strptime(
             show.start_time[:-5],
             '%Y-%m-%dT%H:%M:%S'
         )
-
-        if start_time_dt <= datetime.now():
-            past_shows.append(temp_show)
+        if start_time_dt < datetime.now():
+            past_shows.append({
+                'artist_id': show.artist_id,
+                'artist_name': show.artist.name,
+                'artist_image_link': show.artist.image_link,
+                'start_time': str(show.start_time)
+            })
         else:
-            upcoming_shows.append(temp_show)
+            upcoming_shows.append({
+                'artist_id': show.artist_id,
+                'artist_name': show.artist.name,
+                'artist_image_link': show.artist.image_link,
+                'start_time': str(show.start_time)
+            })
 
     # object class to dict
     data = vars(venue)
@@ -313,23 +315,26 @@ def show_artist(artist_id):
     past_shows = []
     upcoming_shows = []
 
-    for show in artist.shows:
-        temp_show = {
-            'venue_id': show.venue_id,
-            'venue_name': show.venue.name,
-            'venue_image_link': show.venue.image_link,
-            'start_time': str(show.start_time)
-        }
-
+    shows_query = db.session.query(Show).join(Venue).filter(Show.artist_id==artist_id).all()
+    for show in shows_query:
         start_time_dt = datetime.strptime(
             show.start_time[:-5],
             '%Y-%m-%dT%H:%M:%S'
         )
-
-        if start_time_dt <= datetime.now():
-            past_shows.append(temp_show)
+        if start_time_dt < datetime.now():
+            past_shows.append({
+                'venue_id': show.venue_id,
+                'venue_name': show.venue.name,
+                'venue_image_link': show.venue.image_link,
+                'start_time': str(show.start_time)
+            })
         else:
-            upcoming_shows.append(temp_show)
+            upcoming_shows.append({
+                'venue_id': show.venue_id,
+                'venue_name': show.venue.name,
+                'venue_image_link': show.venue.image_link,
+                'start_time': str(show.start_time)
+            })
 
     # object class to dict
     data = vars(artist)
