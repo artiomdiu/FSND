@@ -8,7 +8,7 @@ from wtforms import (
     DateTimeField,
     BooleanField
 )
-from wtforms.validators import DataRequired, AnyOf, URL
+from wtforms.validators import DataRequired, AnyOf, URL, Regexp
 import re
 
 def is_valid_phone(number):
@@ -141,7 +141,7 @@ class VenueForm(Form):
     )
 
     phone = StringField(
-        'phone'
+        'phone', validators=[Regexp(r'^[0-9\-\+]+$')]
     )
 
     image_link = StringField(
@@ -159,7 +159,7 @@ class VenueForm(Form):
     )
 
     website_link = StringField(
-        'website_link'
+        'website_link', validators=[URL()]
     )
 
     seeking_talent = BooleanField( 'seeking_talent' )
@@ -170,7 +170,7 @@ class VenueForm(Form):
 
     def validate(self):
         """Define a custom validate method in you Form"""
-        rv = FlaskForm.validate(self.phone.data)
+        rv = Form.validate(self)
         if not rv:
             return False
         if not is_valid_phone(self.phone.data):
@@ -202,7 +202,7 @@ class ArtistForm(Form):
 
     phone = StringField(
         # TODO implement validation logic for state
-        'phone'
+        'phone', validators=[Regexp(r'^[0-9\-\+]+$')]
     )
 
     image_link = StringField(
@@ -219,7 +219,7 @@ class ArtistForm(Form):
      )
 
     website_link = StringField(
-        'website_link'
+        'website_link', validators=[URL()]
      )
 
     seeking_venue = BooleanField('seeking_venue')
@@ -230,7 +230,7 @@ class ArtistForm(Form):
 
     def validate(self):
         """Define a custom validate method in you Form"""
-        rv = FlaskForm.validate(self.phone.data)
+        rv = Form.validate(self)
         if not rv:
             return False
         if not is_valid_phone(self.phone.data):
