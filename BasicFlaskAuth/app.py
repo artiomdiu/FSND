@@ -7,9 +7,13 @@ from urllib.request import urlopen
 
 app = Flask(__name__)
 
-AUTH0_DOMAIN = @TODO_REPLACE_WITH_YOUR_DOMAIN
-ALGORITHMS = ['RS256']
-API_AUDIENCE = @TODO_REPLACE_WITH_YOUR_API_AUDIENCE
+
+def get_settings():
+    path = 'C:\\Projects\\credentials\\udacity_api_settings.json'
+    f = open(path)
+    auth0_settings = json.load(f)
+
+    return auth0_settings
 
 
 class AuthError(Exception):
@@ -51,7 +55,11 @@ def get_token_auth_header():
     return token
 
 
-def verify_decode_jwt(token):
+def verify_decode_jwt(token, auth0_settings):
+    AUTH0_DOMAIN = auth0_settings["AUTH0_DOMAIN"]
+    ALGORITHMS = auth0_settings["ALGORITHMS"]
+    API_AUDIENCE = auth0_settings["API_AUDIENCE"]
+
     jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
     jwks = json.loads(jsonurl.read())
     unverified_header = jwt.get_unverified_header(token)
@@ -108,17 +116,31 @@ def verify_decode_jwt(token):
 def requires_auth(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
+        auth0_settings = get_settings()
         token = get_token_auth_header()
         try:
-            payload = verify_decode_jwt(token)
+            payload = verify_decode_jwt(token, auth0_settings)
         except:
             abort(401)
         return f(payload, *args, **kwargs)
 
     return wrapper
 
+
+"""
+To get access token from Auth0 enter following:
+curl --request POST \
+  --url https://dev-h1lo0rw8.eu.auth0.com/oauth/token \
+  --header 'content-type: application/json' \
+  --data '{"client_id":"7ARqH68xgE6sLVF3Zgolos4PatWSAmgq","client_secret":"cdK_PgxOVoOw9dPyAMzSnsdhS8MuNnb7ZLuO-yzP93fwHW1nT7iyvLzo3fARa03f","audience":"image","grant_type":"client_credentials"}'
+"""
+
+
 @app.route('/headers')
 @requires_auth
 def headers(payload):
-    print(payload)
     return 'Access Granted'
+
+#
+# if __name__ == '__main__':
+#     app.run()
