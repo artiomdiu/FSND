@@ -127,15 +127,6 @@ def requires_auth(f):
     return wrapper
 
 
-"""
-To get access token from Auth0 enter following:
-curl --request POST \
-  --url https://dev-h1lo0rw8.eu.auth0.com/oauth/token \
-  --header 'content-type: application/json' \
-  --data '{"client_id":"7ARqH68xgE6sLVF3Zgolos4PatWSAmgq","client_secret":"cdK_PgxOVoOw9dPyAMzSnsdhS8MuNnb7ZLuO-yzP93fwHW1nT7iyvLzo3fARa03f","audience":"image","grant_type":"client_credentials"}'
-"""
-
-
 @app.route('/headers')
 @requires_auth
 def headers(payload):
