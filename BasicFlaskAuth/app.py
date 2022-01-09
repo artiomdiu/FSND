@@ -1,11 +1,15 @@
-from flask import Flask, request, abort
+from flask import Flask, request, abort, jsonify
 import json
 from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
 
+from cryptography.fernet import Fernet
 
 app = Flask(__name__)
+
+
+plaintext = b"some random text to encrypt"
 
 
 def get_settings():
@@ -113,6 +117,30 @@ def verify_decode_jwt(token, auth0_settings):
             }, 400)
 
 
+def generate_key():
+    # Generate a key
+    key = Fernet.generate_key()
+
+    # Instantiate a Fernet instance
+    f = Fernet(key)
+
+    return key
+
+
+def encrypt(message, key):
+    f = Fernet(key)
+    ciphertext = f.encrypt(message)
+
+    return ciphertext
+
+
+def decrypt(message, key):
+    f = Fernet(key)
+    decryptedtext = f.decrypt(message)
+
+    return decryptedtext
+
+
 def requires_auth(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -125,6 +153,24 @@ def requires_auth(f):
         return f(payload, *args, **kwargs)
 
     return wrapper
+
+
+@app.route('/')
+def encrypt_decrypt_msg():
+    key = generate_key()
+
+    encrypted_msg = encrypt(plaintext, key)
+
+    decrypted_msg = decrypt(encrypted_msg, key)
+
+    return jsonify(
+        {
+            "key": str(key),
+            "plaint text": str(plaintext),
+            "encrypted text": str(encrypted_msg),
+            "decrypted text": str(decrypted_msg)
+        }, 200
+    )
 
 
 @app.route('/headers')
