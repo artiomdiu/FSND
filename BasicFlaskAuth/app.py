@@ -5,11 +5,13 @@ from jose import jwt
 from urllib.request import urlopen
 
 from cryptography.fernet import Fernet
+import hashlib
 
 app = Flask(__name__)
 
 
-plaintext = b"some random text to encrypt"
+plaintext = b"somerandomtext"
+plaintext_str = 'somerandomtext'
 
 
 def get_settings():
@@ -141,41 +143,68 @@ def decrypt(message, key):
     return decryptedtext
 
 
-def requires_auth(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        auth0_settings = get_settings()
-        token = get_token_auth_header()
-        try:
-            payload = verify_decode_jwt(token, auth0_settings)
-        except:
-            abort(401)
-        return f(payload, *args, **kwargs)
+def hash(message):
+    hashedtext = hashlib.md5(message.encode()).hexdigest()
 
-    return wrapper
+    return hashedtext
 
 
-@app.route('/')
-def encrypt_decrypt_msg():
-    key = generate_key()
-
-    encrypted_msg = encrypt(plaintext, key)
-
-    decrypted_msg = decrypt(encrypted_msg, key)
-
-    return jsonify(
-        {
-            "key": str(key),
-            "plaint text": str(plaintext),
-            "encrypted text": str(encrypted_msg),
-            "decrypted text": str(decrypted_msg)
-        }, 200
-    )
+def check_permissions(permission, payload):
+    if 'permissions' not in payload:
+        abort(400)
+    if permission not in payload['permissions']:
+        abort(403)
+    return True
 
 
-@app.route('/headers')
-@requires_auth
-def headers(payload):
+def requires_auth(permission=''):
+    def requires_auth_decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            auth0_settings = get_settings()
+            token = get_token_auth_header()
+            try:
+                payload = verify_decode_jwt(token, auth0_settings)
+            except:
+                abort(401)
+
+            check_permissions(permission, payload)
+
+            return f(payload, *args, **kwargs)
+
+        return wrapper
+    return requires_auth_decorator
+
+# @app.route('/')
+# def encrypt_decrypt_msg():
+#     key = generate_key()
+#
+#     encrypted_msg = encrypt(plaintext, key)
+#
+#     decrypted_msg = decrypt(encrypted_msg, key)
+#
+#     hashed_msg = hash(plaintext_str)
+#
+#     return jsonify(
+#         {
+#             "key": str(key),
+#             "plaint text": str(plaintext),
+#             "encrypted text": str(encrypted_msg),
+#             "decrypted text": str(decrypted_msg),
+#             "md5 hashed text": str(hashed_msg)
+#         }, 200
+#     )
+
+
+# @app.route('/headers')
+# @requires_auth
+# def headers(payload):
+#     return 'Access Granted'
+
+
+@app.route('/image')
+@requires_auth('get:images')
+def images(payload):
     return 'Access Granted'
 
 #
