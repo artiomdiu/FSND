@@ -168,8 +168,8 @@ def requires_auth(permission=''):
         @wraps(f)
         def wrapper(*args, **kwargs):
             auth0_settings = get_settings()
-            token = get_token_auth_header()
             try:
+                token = get_token_auth_header()
                 payload = verify_decode_jwt(token, auth0_settings)
             except:
                 abort(401)
